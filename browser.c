@@ -8,6 +8,7 @@ static void goForwardCb(GtkWidget* button, WebKitWebView* webView);
 static void refreshCb(GtkWidget* button, WebKitWebView* webView);
 static void loadUrlCb(GtkWidget* entry, WebKitWebView* webView);
 static void updateNavigationButtons(WebKitWebView* webView, WebKitLoadEvent load_event, gpointer user_data);
+static void updateUrlBar(WebKitWebView* webView, WebKitLoadEvent load_event, gpointer user_data);
 
 typedef struct {
     GtkWidget *backButton;
@@ -53,7 +54,6 @@ static void activate(GtkApplication* app, gpointer user_data) {
 
     // Create URL bar
     urlBar = gtk_entry_new();
-    gtk_entry_set_placeholder_text(GTK_ENTRY(urlBar), "Enter URL");
 
     // Add buttons and URL bar to header bar
     gtk_header_bar_pack_start(GTK_HEADER_BAR(headerBar), backButton);
@@ -77,6 +77,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
     g_signal_connect(forwardButton, "clicked", G_CALLBACK(goForwardCb), webView);
     g_signal_connect(refreshButton, "clicked", G_CALLBACK(refreshCb), webView);
     g_signal_connect(urlBar, "activate", G_CALLBACK(loadUrlCb), webView);
+    g_signal_connect(webView, "load-changed", G_CALLBACK(updateUrlBar), urlBar);
 
     // Set up navigation buttons updating
     navButtons = g_new(NavigationButtons, 1);
@@ -85,7 +86,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
     g_signal_connect(webView, "load-changed", G_CALLBACK(updateNavigationButtons), navButtons);
 
     // Load a default web page
-    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(webView), "https://www.example.com");
+    webkit_web_view_load_uri(WEBKIT_WEB_VIEW(webView), "https://search.brave.com/");
 
     // Show all widgets
     gtk_widget_show_all(window);
@@ -117,4 +118,10 @@ static void updateNavigationButtons(WebKitWebView* webView, WebKitLoadEvent load
     NavigationButtons *buttons = (NavigationButtons*)user_data;
     gtk_widget_set_sensitive(buttons->backButton, webkit_web_view_can_go_back(webView));
     gtk_widget_set_sensitive(buttons->forwardButton, webkit_web_view_can_go_forward(webView));
+}
+
+static void updateUrlBar(WebKitWebView *webView, WebKitLoadEvent load_event, gpointer user_data) {
+  GtkWidget *urlBar = (GtkWidget*)user_data;
+  const gchar *uri = webkit_web_view_get_uri(webView);  // Get current URL
+  gtk_entry_set_text(GTK_ENTRY(urlBar), uri);  // Set URL as text
 }
