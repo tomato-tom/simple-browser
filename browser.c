@@ -44,7 +44,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
     // Create header bar
     headerBar = gtk_header_bar_new();
     gtk_header_bar_set_show_close_button(GTK_HEADER_BAR(headerBar), TRUE);
-    gtk_header_bar_set_title(GTK_HEADER_BAR(headerBar), "Simple WebKit Browser");
+    gtk_header_bar_set_title(GTK_HEADER_BAR(headerBar), "Simple Browser");
     gtk_window_set_titlebar(GTK_WINDOW(window), headerBar);
 
     // Create navigation buttons
@@ -54,6 +54,7 @@ static void activate(GtkApplication* app, gpointer user_data) {
 
     // Create URL bar
     urlBar = gtk_entry_new();
+    gtk_widget_set_size_request(urlBar, 300, -1);
 
     // Add buttons and URL bar to header bar
     gtk_header_bar_pack_start(GTK_HEADER_BAR(headerBar), backButton);
